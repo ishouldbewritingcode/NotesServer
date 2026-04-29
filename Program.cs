@@ -4,6 +4,7 @@ using GraphQL.Types;
 using NotesServer.GraphQL;
 using NotesServer.GraphQL.Types;
 using NotesServer.Services;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,19 +41,47 @@ app.MapPost("/graphql", async (HttpContext context, AppSchema schema, IDocumentE
         Schema = schema,
         Query = request.Query,
         OperationName = request.OperationName,
-        Variables = request.Variables ?? new Inputs(new Dictionary<string, object?>())
+        Variables = request.Variables != null ? new Inputs(ConvertVariables(request.Variables)) : new Inputs(new Dictionary<string, object>())
     });
 
-    await context.Response.WriteAsJsonAsync(result);
+    var serializer = new GraphQL.SystemTextJson.GraphQLSerializer();
+    var json = serializer.Serialize(result);
+    context.Response.ContentType = "application/json";
+    await context.Response.WriteAsync(json);
 }).WithName("GraphQL");
 
 app.Run();
+
+Dictionary<string, object> ConvertVariables(Dictionary<string, object> variables)
+{
+    var result = new Dictionary<string, object>();
+    foreach (var kvp in variables)
+    {
+        if (kvp.Value is JsonElement je)
+        {
+            result[kvp.Key] = je.ValueKind switch
+            {
+                JsonValueKind.String => je.GetString(),
+                JsonValueKind.Number => je.TryGetInt32(out int i) ? i : je.GetDouble(),
+                JsonValueKind.True => true,
+                JsonValueKind.False => false,
+                JsonValueKind.Null => null,
+                _ => je.ToString() // for arrays/objects, but for now
+            };
+        }
+        else
+        {
+            result[kvp.Key] = kvp.Value;
+        }
+    }
+    return result;
+}
 
 // Request model for GraphQL queries
 public class GraphQLRequest
 {
     public string? Query { get; set; }
     public string? OperationName { get; set; }
-    public Inputs? Variables { get; set; }
+    public Dictionary<string, object>? Variables { get; set; }
 }
 
