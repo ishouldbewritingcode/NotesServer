@@ -12,36 +12,34 @@ public class NoteService : INoteService
         _connectionString = configuration.GetConnectionString("DefaultConnection") ?? "Data Source=ReactTanstackNotes.db";
     }
 
-    public async Task<IEnumerable<User>> GetAllUsers()
+    public async Task<User?> GetUserByEmail(string email)
     {
-        var users = new List<User>();
-
         try
         {
             using var connection = new SqliteConnection(_connectionString);
             await connection.OpenAsync();
 
             using var command = connection.CreateCommand();
-            command.CommandText = "SELECT Id, Name, Email FROM User";
+            command.CommandText = "SELECT Id, Name, Email FROM User WHERE Email = @email";
+            command.Parameters.AddWithValue("@email", email);
 
             using var reader = await command.ExecuteReaderAsync();
-            while (await reader.ReadAsync())
+            if (await reader.ReadAsync())
             {
-                var user = new User
+                return new User
                 {
                     Id = Guid.Parse(reader.GetString(0)),
                     Name = reader.GetString(1),
                     Email = reader.GetString(2)
                 };
-                users.Add(user);
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error fetching users: {ex.Message}");
+            Console.WriteLine($"Error fetching user by email: {ex.Message}");
         }
 
-        return users;
+        return null;
     }
 
     public async Task<IEnumerable<Note>> GetAllNotes()

@@ -10,9 +10,14 @@ public class AppQuery : ObjectGraphType
 {
     public AppQuery(INoteService noteService)
     {
-        Field<ListGraphType<UserType>>("users")
-            .Description("Get all users")
-            .ResolveAsync(async _ => (object?)await noteService.GetAllUsers());
+        Field<UserType>("userByEmail")
+            .Argument<NonNullGraphType<StringGraphType>>("email", "User email")
+            .Description("Get a user by email")
+            .ResolveAsync(async context =>
+            {
+                var email = context.GetArgument<string>("email");
+                return await noteService.GetUserByEmail(email);
+            });
 
         Field<ListGraphType<NoteType>>("notes")
             .Description("Get all notes")

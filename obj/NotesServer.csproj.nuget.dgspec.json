@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Bryan\\source\\repos\\ReactTanStackNotes\\NotesServer\\NotesServer.csproj": {}
+    "C:\\Users\\Bryan\\source\\repos\\ReactTanstackNotes\\NotesServer\\NotesServer.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Bryan\\source\\repos\\ReactTanStackNotes\\NotesServer\\NotesServer.csproj": {
+    "C:\\Users\\Bryan\\source\\repos\\ReactTanstackNotes\\NotesServer\\NotesServer.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Bryan\\source\\repos\\ReactTanStackNotes\\NotesServer\\NotesServer.csproj",
+        "projectUniqueName": "C:\\Users\\Bryan\\source\\repos\\ReactTanstackNotes\\NotesServer\\NotesServer.csproj",
         "projectName": "NotesServer",
-        "projectPath": "C:\\Users\\Bryan\\source\\repos\\ReactTanStackNotes\\NotesServer\\NotesServer.csproj",
+        "projectPath": "C:\\Users\\Bryan\\source\\repos\\ReactTanstackNotes\\NotesServer\\NotesServer.csproj",
         "packagesPath": "C:\\Users\\Bryan\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Bryan\\source\\repos\\ReactTanStackNotes\\NotesServer\\obj\\",
+        "outputPath": "C:\\Users\\Bryan\\source\\repos\\ReactTanstackNotes\\NotesServer\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
