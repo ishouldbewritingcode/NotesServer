@@ -1,0 +1,11 @@
+using GraphQL.Types;
+
+namespace NotesServer.GraphQL;
+
+public class AppSchema : Schema
+{
+    public AppSchema(IServiceProvider serviceProvider) : base(serviceProvider)
+    {
+        Query = serviceProvider.GetRequiredService<AppQuery>();
+    }
+}
