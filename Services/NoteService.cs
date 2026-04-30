@@ -52,7 +52,7 @@ public class NoteService : INoteService
             await connection.OpenAsync();
 
             using var command = connection.CreateCommand();
-            command.CommandText = "SELECT Id, Note, UserId FROM Note";
+            command.CommandText = "SELECT Id, Title, Note, UserId FROM Note";
 
             using var reader = await command.ExecuteReaderAsync();
             while (await reader.ReadAsync())
@@ -60,8 +60,9 @@ public class NoteService : INoteService
                 var note = new Note
                 {
                     Id = Guid.Parse(reader.GetString(0)),
-                    Text = reader.GetString(1),
-                    UserId = Guid.Parse(reader.GetString(2))
+                    Title = reader.GetString(1),
+                    Text = reader.GetString(2),
+                    UserId = Guid.Parse(reader.GetString(3))
                 };
                 notes.Add(note);
             }
@@ -114,7 +115,7 @@ public class NoteService : INoteService
             await connection.OpenAsync();
 
             using var command = connection.CreateCommand();
-            command.CommandText = "SELECT Id, Note, UserId FROM Note WHERE UserId = @userId";
+            command.CommandText = "SELECT Id, Title, Note, UserId FROM Note WHERE UserId = @userId";
             command.Parameters.AddWithValue("@userId", userId.ToString());
 
             using var reader = await command.ExecuteReaderAsync();
@@ -123,8 +124,9 @@ public class NoteService : INoteService
                 var note = new Note
                 {
                     Id = Guid.Parse(reader.GetString(0)),
-                    Text = reader.GetString(1),
-                    UserId = Guid.Parse(reader.GetString(2))
+                    Title = reader.GetString(1),
+                    Text = reader.GetString(2),
+                    UserId = Guid.Parse(reader.GetString(3))
                 };
                 notes.Add(note);
             }
@@ -166,7 +168,7 @@ public class NoteService : INoteService
 
             // Get notes for user
             using var notesCommand = connection.CreateCommand();
-            notesCommand.CommandText = "SELECT Id, Note, UserId FROM Note WHERE UserId = @userId";
+            notesCommand.CommandText = "SELECT Id, Title, Note, UserId FROM Note WHERE UserId = @userId";
             notesCommand.Parameters.AddWithValue("@userId", user.Id.ToString());
 
             var notes = new List<Note>();
@@ -176,8 +178,9 @@ public class NoteService : INoteService
                 notes.Add(new Note
                 {
                     Id = Guid.Parse(notesReader.GetString(0)),
-                    Text = notesReader.GetString(1),
-                    UserId = Guid.Parse(notesReader.GetString(2))
+                    Title = notesReader.GetString(1),
+                    Text = notesReader.GetString(2),
+                    UserId = Guid.Parse(notesReader.GetString(3))
                 });
             }
 
