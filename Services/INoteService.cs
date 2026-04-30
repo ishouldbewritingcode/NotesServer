@@ -8,4 +8,5 @@ public interface INoteService
     Task<IEnumerable<Note>> GetAllNotes();
     Task<User?> GetUserById(Guid id);
     Task<IEnumerable<Note>> GetNotesByUserId(Guid userId);
+    Task<(User?, IEnumerable<Note>)> GetUserWithNotesByEmail(string email);
 }

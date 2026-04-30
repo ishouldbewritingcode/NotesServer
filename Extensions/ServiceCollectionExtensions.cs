@@ -15,6 +15,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<AppSchema>();
         services.AddScoped<UserType>();
         services.AddScoped<NoteType>();
+        services.AddScoped<UserWithNotesType>();
         services.AddScoped<INoteService, NoteService>();
         services.AddScoped<IDocumentExecuter, DocumentExecuter>();
 

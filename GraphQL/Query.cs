@@ -40,5 +40,20 @@ public class AppQuery : ObjectGraphType
                 var userId = context.GetArgument<Guid>("userId");
                 return (object?)await noteService.GetNotesByUserId(userId);
             });
+
+        Field<UserWithNotesType>("userWithNotesByEmail")
+            .Argument<NonNullGraphType<StringGraphType>>("email", "User email")
+            .Description("Get a user and all their associated notes by email")
+            .ResolveAsync(async context =>
+            {
+                var email = context.GetArgument<string>("email");
+                var (user, notes) = await noteService.GetUserWithNotesByEmail(email);
+
+                return new
+                {
+                    user = user,
+                    notes = notes
+                };
+            });
     }
 }

@@ -183,6 +183,59 @@
 					}
 				}
 			]
+		},
+		{
+			"name": "Get User with Notes By Email",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"query\": \"query GetUserWithNotes($email: String!) { userWithNotesByEmail(email: $email) { user { id name email } notes { id text userId } } }\",\n  \"operationName\": \"GetUserWithNotes\",\n  \"variables\": { \"email\": \"test@example.com\" }\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/graphql",
+					"host": ["{{baseUrl}}"],
+					"path": ["graphql"]
+				}
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"const jsonData = pm.response.json();",
+							"pm.test('No GraphQL errors', function () {",
+							"    pm.expect(jsonData.errors).to.be.undefined;",
+							"});",
+							"pm.test('User and notes data returned', function () {",
+							"    pm.expect(jsonData.data).to.have.property('userWithNotesByEmail');",
+							"    const userWithNotes = jsonData.data.userWithNotesByEmail;",
+							"    pm.expect(userWithNotes).to.have.property('user');",
+							"    pm.expect(userWithNotes).to.have.property('notes');",
+							"    pm.expect(userWithNotes.notes).to.be.an('array');",
+							"});",
+							"pm.test('User has required fields', function () {",
+							"    const user = jsonData.data.userWithNotesByEmail.user;",
+							"    if (user) {",
+							"        pm.expect(user).to.have.property('id');",
+							"        pm.expect(user).to.have.property('name');",
+							"        pm.expect(user).to.have.property('email');",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
 		}
 	]
 }

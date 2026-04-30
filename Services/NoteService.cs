@@ -136,4 +136,57 @@ public class NoteService : INoteService
 
         return notes;
     }
+
+    public async Task<(User?, IEnumerable<Note>)> GetUserWithNotesByEmail(string email)
+    {
+        try
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            await connection.OpenAsync();
+
+            // Get user
+            using var userCommand = connection.CreateCommand();
+            userCommand.CommandText = "SELECT Id, Name, Email FROM User WHERE Email = @email";
+            userCommand.Parameters.AddWithValue("@email", email);
+
+            User? user = null;
+            using var userReader = await userCommand.ExecuteReaderAsync();
+            if (await userReader.ReadAsync())
+            {
+                user = new User
+                {
+                    Id = Guid.Parse(userReader.GetString(0)),
+                    Name = userReader.GetString(1),
+                    Email = userReader.GetString(2)
+                };
+            }
+
+            if (user == null)
+                return (null, Enumerable.Empty<Note>());
+
+            // Get notes for user
+            using var notesCommand = connection.CreateCommand();
+            notesCommand.CommandText = "SELECT Id, Note, UserId FROM Note WHERE UserId = @userId";
+            notesCommand.Parameters.AddWithValue("@userId", user.Id.ToString());
+
+            var notes = new List<Note>();
+            using var notesReader = await notesCommand.ExecuteReaderAsync();
+            while (await notesReader.ReadAsync())
+            {
+                notes.Add(new Note
+                {
+                    Id = Guid.Parse(notesReader.GetString(0)),
+                    Text = notesReader.GetString(1),
+                    UserId = Guid.Parse(notesReader.GetString(2))
+                });
+            }
+
+            return (user, notes);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching user with notes: {ex.Message}");
+            return (null, Enumerable.Empty<Note>());
+        }
+    }
 }
