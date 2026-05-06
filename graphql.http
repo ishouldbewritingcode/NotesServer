@@ -6,7 +6,7 @@ POST http://localhost:5300/graphql
 Content-Type: application/json
 
 {
-  "query": "{ users { id name email } }"
+  "query": "{ user { id name email } }"
 }
 
 ###
