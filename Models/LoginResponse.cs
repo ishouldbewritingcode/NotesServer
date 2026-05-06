@@ -3,7 +3,8 @@ namespace NotesServer.Models;
 public class LoginResponse
 {
     public string Token { get; set; } = string.Empty;
-    public UserInfo User { get; set; } = new();
+    public UserInfo? User { get; set; }
+    public bool RequiresName { get; set; }
 }
 
 public class UserInfo

@@ -42,6 +42,23 @@ public class NoteService : INoteService
         return null;
     }
 
+    public async Task<User> CreateUser(string email, string name)
+    {
+        var user = new User { Id = Guid.NewGuid(), Name = name, Email = email };
+
+        using var connection = new SqliteConnection(_connectionString);
+        await connection.OpenAsync();
+
+        using var command = connection.CreateCommand();
+        command.CommandText = "INSERT INTO User (Id, Name, Email) VALUES (@id, @name, @email)";
+        command.Parameters.AddWithValue("@id", user.Id.ToString());
+        command.Parameters.AddWithValue("@name", user.Name);
+        command.Parameters.AddWithValue("@email", user.Email);
+        await command.ExecuteNonQueryAsync();
+
+        return user;
+    }
+
     public async Task<IEnumerable<Note>> GetAllNotes()
     {
         var notes = new List<Note>();
@@ -137,6 +154,70 @@ public class NoteService : INoteService
         }
 
         return notes;
+    }
+
+    public async Task<Note> CreateNote(Guid userId, string title, string text)
+    {
+        var note = new Note { Id = Guid.NewGuid(), Title = title, Text = text, UserId = userId };
+
+        using var connection = new SqliteConnection(_connectionString);
+        await connection.OpenAsync();
+
+        using var command = connection.CreateCommand();
+        command.CommandText = "INSERT INTO Note (Id, Title, Note, UserId) VALUES (@id, @title, @text, @userId)";
+        command.Parameters.AddWithValue("@id", note.Id.ToString());
+        command.Parameters.AddWithValue("@title", note.Title);
+        command.Parameters.AddWithValue("@text", note.Text);
+        command.Parameters.AddWithValue("@userId", note.UserId.ToString());
+        await command.ExecuteNonQueryAsync();
+
+        return note;
+    }
+
+    public async Task<Note?> UpdateNote(Guid id, string title, string text)
+    {
+        using var connection = new SqliteConnection(_connectionString);
+        await connection.OpenAsync();
+
+        using var command = connection.CreateCommand();
+        command.CommandText = "UPDATE Note SET Title = @title, Note = @text WHERE Id = @id";
+        command.Parameters.AddWithValue("@title", title);
+        command.Parameters.AddWithValue("@text", text);
+        command.Parameters.AddWithValue("@id", id.ToString());
+
+        var rows = await command.ExecuteNonQueryAsync();
+        if (rows == 0) return null;
+
+        using var selectCommand = connection.CreateCommand();
+        selectCommand.CommandText = "SELECT Id, Title, Note, UserId FROM Note WHERE Id = @id";
+        selectCommand.Parameters.AddWithValue("@id", id.ToString());
+
+        using var reader = await selectCommand.ExecuteReaderAsync();
+        if (await reader.ReadAsync())
+        {
+            return new Note
+            {
+                Id = Guid.Parse(reader.GetString(0)),
+                Title = reader.GetString(1),
+                Text = reader.GetString(2),
+                UserId = Guid.Parse(reader.GetString(3))
+            };
+        }
+
+        return null;
+    }
+
+    public async Task<bool> DeleteNote(Guid id)
+    {
+        using var connection = new SqliteConnection(_connectionString);
+        await connection.OpenAsync();
+
+        using var command = connection.CreateCommand();
+        command.CommandText = "DELETE FROM Note WHERE Id = @id";
+        command.Parameters.AddWithValue("@id", id.ToString());
+
+        var rows = await command.ExecuteNonQueryAsync();
+        return rows > 0;
     }
 
     public async Task<(User?, IEnumerable<Note>)> GetUserWithNotesByEmail(string email)

@@ -17,13 +17,16 @@ public class AuthenticationService : IAuthenticationService
         _configuration = configuration;
     }
 
-    public async Task<LoginResponse?> LoginAsync(string email)
+    public async Task<LoginResponse> LoginAsync(string email, string? name = null)
     {
-        // For this demo app, we just verify the user exists by email
         var user = await _noteService.GetUserByEmail(email);
+
         if (user == null)
         {
-            return null;
+            if (name == null)
+                return new LoginResponse { RequiresName = true };
+
+            user = await _noteService.CreateUser(email, name);
         }
 
         var token = GenerateToken(user);

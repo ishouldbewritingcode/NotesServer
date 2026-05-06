@@ -17,6 +17,9 @@ public class LoginResponseType : ObjectGraphType<LoginResponse>
     public LoginResponseType()
     {
         Field(x => x.Token).Description("JWT authentication token");
-        Field<UserInfoType>("user", "User information");
+        Field(x => x.RequiresName).Description("True when a new user must supply their name");
+        Field<UserInfoType>("user")
+            .Description("User information")
+            .Resolve(ctx => ctx.Source.User);
     }
 }
