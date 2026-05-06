@@ -94,3 +94,6 @@ build/
 
 # IDE
 .editorconfig.local
+
+#database
+ReactTanstackNotes.db
