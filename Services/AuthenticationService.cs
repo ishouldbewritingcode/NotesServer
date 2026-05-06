@@ -17,10 +17,9 @@ public class AuthenticationService : IAuthenticationService
         _configuration = configuration;
     }
 
-    public async Task<LoginResponse?> LoginAsync(string email, string password)
+    public async Task<LoginResponse?> LoginAsync(string email)
     {
-        // For this sample app, we just verify the user exists by email
-        // In a production app, you would hash and verify the password here
+        // For this demo app, we just verify the user exists by email
         var user = await _noteService.GetUserByEmail(email);
         if (user == null)
         {
@@ -42,7 +41,7 @@ public class AuthenticationService : IAuthenticationService
 
     public string GenerateToken(User user)
     {
-        var key = _configuration["Jwt:SecretKey"] 
+        var key = _configuration["Jwt:SecretKey"]
             ?? throw new InvalidOperationException("JWT secret key not configured");
         var issuer = _configuration["Jwt:Issuer"] ?? "NotesServer";
         var audience = _configuration["Jwt:Audience"] ?? "NotesApp";

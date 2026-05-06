@@ -11,17 +11,15 @@ public class AppMutation : ObjectGraphType
     {
         Field<LoginResponseType>("login")
             .Argument<NonNullGraphType<StringGraphType>>("email", "User email")
-            .Argument<NonNullGraphType<StringGraphType>>("password", "User password")
-            .Description("Login with email and password")
+            .Description("Login with email")
             .ResolveAsync(async context =>
             {
                 var email = context.GetArgument<string>("email");
-                var password = context.GetArgument<string>("password");
 
-                var result = await authService.LoginAsync(email, password);
+                var result = await authService.LoginAsync(email);
                 if (result == null)
                 {
-                    throw new ExecutionError("Invalid email or password");
+                    throw new ExecutionError("Invalid email");
                 }
 
                 return result;
